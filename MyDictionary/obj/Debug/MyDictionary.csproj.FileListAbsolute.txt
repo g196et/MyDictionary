@@ -1,0 +1,7 @@
+C:\Users\Константин\Documents\Visual Studio 2012\Projects\XNA Lesson\MyDictionary\MyDictionary\bin\Debug\MyDictionary.exe.config
+C:\Users\Константин\Documents\Visual Studio 2012\Projects\MyDictionary\MyDictionary\bin\Debug\MyDictionary.exe.config
+C:\Users\Константин\Documents\Visual Studio 2012\Projects\MyDictionary\MyDictionary\bin\Debug\MyDictionary.exe
+C:\Users\Константин\Documents\Visual Studio 2012\Projects\MyDictionary\MyDictionary\bin\Debug\MyDictionary.pdb
+C:\Users\Константин\Documents\Visual Studio 2012\Projects\MyDictionary\MyDictionary\obj\Debug\MyDictionary.csprojResolveAssemblyReference.cache
+C:\Users\Константин\Documents\Visual Studio 2012\Projects\MyDictionary\MyDictionary\obj\Debug\MyDictionary.exe
+C:\Users\Константин\Documents\Visual Studio 2012\Projects\MyDictionary\MyDictionary\obj\Debug\MyDictionary.pdb
