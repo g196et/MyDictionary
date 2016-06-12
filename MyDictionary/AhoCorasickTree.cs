@@ -122,7 +122,27 @@ namespace MyDictionary
 
         public void DelPatternToTree(string pattern)
         {
-
+            var latestNode = _rootNode;
+            //tmp = поедпоследний Node
+            var tmpNode = _rootNode;
+            var length = pattern.Length;
+            for (var i = 0; i < length; i++)
+            {
+                tmpNode = latestNode;
+                latestNode = latestNode.GetNode(pattern[i]);
+            }
+            //Если это лист, то только его и удаляем (+ возможно нужна проверка,является ли его родитель листом
+            //и имеет ли он значение, добавлен ли он в словарь)
+            if (latestNode.IsFinished)
+            {
+                tmpNode.IsFinished = true;
+                latestNode = null;
+            }
+            //Results как я понял массив, который говорит, что вот этотузел, хранит вот такие значения
+            else
+            {
+                latestNode.Results.Remove(pattern);
+            }
         }
 
         private void SetFailures()
@@ -215,6 +235,18 @@ namespace MyDictionary
                 _entries[_count].Next = _buckets[targetBucket];
                 _buckets[targetBucket] = _count;
                 _count++;
+
+                return node;
+            }
+
+            public AhoCorasickTreeNode DelNode()
+            {
+                var node = this.Parent;
+                //переделать
+                var newSize = _count - 1;
+                Resize(newSize);
+
+                _count--;
 
                 return node;
             }

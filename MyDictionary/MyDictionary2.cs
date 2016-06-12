@@ -26,11 +26,12 @@ namespace MyDictionary
             }
         }
 
-        public bool Find(string key)
+        public string Find(string key)
         {
             if (aho.Contains(key))
-                return true;
-            else return false;
+                //Надо научиться возвращать value по key
+                return "true";
+            else return "false";
         }
 
         public bool Insert(string key, string value)
@@ -57,16 +58,19 @@ namespace MyDictionary
             else return false;
         }
 
-        public void Remove(string key)
+        public bool Remove(string key)
         {
             if (aho == null)
             {
-                //return false;
+                return false;
             }
             if (aho.Contains(key))
             {
-                //удалить
+                aho.DelPatternToTree(key);
+                //здесь надо удалить значения из keys и values
+                return true;
             }
+            return false;
         }
     }
 }

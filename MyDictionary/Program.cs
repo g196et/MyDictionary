@@ -32,9 +32,8 @@ namespace MyDictionary
                     case ("f"):
                         Console.Write("Key = ");
                         key = Console.ReadLine();
-                        if (myDictionary.Find(key))
-                            Console.WriteLine("Item is exist");
-                        else Console.WriteLine("Item not found");
+                        string temp = myDictionary.Find(key);
+                        Console.WriteLine(temp);
                         break;
                     //case ("Remove"):
                     //    Console.Write("Key = ");
