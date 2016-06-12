@@ -27,9 +27,9 @@ namespace MyDictionary
         int GetHash(string key)
         {
             int hash = 0;
-            foreach (char c in key)
+            for (int i = 0 ; i < key.Length ; i++)
             {
-                hash = (hash * size + c) % randomConst;
+                hash += (int)Math.Pow(size, key.Length -1 - i) * (int)(key[i]);
             }
             return hash;
         }
@@ -79,10 +79,15 @@ namespace MyDictionary
 
         public void Print()
         {
+            int count = 0;
             foreach (string tmp in hashList)
                 if (tmp != null)
+                {
                     Console.Write(tmp + " ");
+                    count++;
+                }
             Console.WriteLine();
+            Console.WriteLine("COUNT = " + count);
         }
 
     }
