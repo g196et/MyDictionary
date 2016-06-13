@@ -12,142 +12,127 @@ namespace MyDictionary
 
         public AhoCorasickTree() { }
 
-        public AhoCorasickTree(string[] keywords)
+        public AhoCorasickTree(string keyword, string value)
         {
-            if (keywords == null) throw new ArgumentNullException("keywords");
-            if (keywords.Length == 0) throw new ArgumentException("should contain keywords");
+            //Обрабатываем ошибки
+            if (keyword == null) throw new ArgumentNullException("keywords");
+            if (keyword.Length == 0) throw new ArgumentException("should contain keywords");
 
+            //Устанавливаем корень
             _rootNode = new AhoCorasickTreeNode();
+            _rootNode.Failure = _rootNode;
 
-            var length = keywords.Length;
-            for (var i = 0; i < length; i++)
-            {
-                AddPatternToTree(keywords[i]);
-            }
+            //Добавляем первый паттерн
+            AddPatternToTree(keyword, value);
 
-            SetFailures();
+            //SetFailures();
         }
 
-        public bool Contains(string text)
+        /// <summary>
+        /// Содержание слова в дереве
+        /// </summary>
+        /// <param name="text">Првоеряемое слово</param>
+        /// <returns>Значение для словаря</returns>
+        public string Contains(string text)
         {
             var currentNode = _rootNode;
 
             var length = text.Length;
+            //Идём по всем символам слова
             for (var i = 0; i < length; i++)
             {
                 while (true)
                 {
+                    //Проверяем, есть ли следующий символ в потомках узла
                     var node = currentNode.GetNode(text[i]);
                     if (node == null)
                     {
                         currentNode = currentNode.Failure;
-                        //HERE FIX
-                        return false;
-                        //if (currentNode == _rootNode)
-                        //{
-                        //    break;
-                        //}
+                        return null;
                     }
                     else
                     {
-                        if ((node.IsFinished) && (i == length - 1))
+                        if (i == length - 1)
                         {
-                            return true;
+                            return node.Results;
                         }
-
                         currentNode = node;
                         break;
                     }
                 }
             }
 
-            return false;
+            return null;
         }
 
-        // todo copy paste from Contains method: Refactor!
-        // todo check performance 
-        public IEnumerable<KeyValuePair<string, int>> Search(string text)
-        {
-            var currentNode = _rootNode;
-
-            var length = text.Length;
-            for (var i = 0; i < length; i++)
-            {
-                while (true)
-                {
-                    var node = currentNode.GetNode(text[i]);
-                    if (node == null)
-                    {
-                        currentNode = currentNode.Failure;
-                        if (currentNode == _rootNode)
-                        {
-                            // try to continue with the same pattern
-                            node = currentNode.GetNode(text[i]);
-                            if (node == null)
-                            {
-                                break;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        if (node.IsFinished)
-                        {
-                            foreach (var result in node.Results)
-                            {
-                                yield return new KeyValuePair<string, int>(result, i - result.Length + 1);
-                            }
-                        }
-
-                        currentNode = node;
-                        break;
-                    }
-                }
-            }
-        }
-
-        public void AddPatternToTree(string pattern)
+        /// <summary>
+        /// Метод добавления слова в дерево
+        /// </summary>
+        /// <param name="pattern">Добавляемое слово</param>
+        /// <param name="value">Его значение для словаря</param>
+        public void AddPatternToTree(string pattern, string value)
         {
             var latestNode = _rootNode;
+            var tempNode = _rootNode;
             var length = pattern.Length;
+            //Проверяем все символы из слова
             for (var i = 0; i < length; i++)
             {
-                latestNode = latestNode.GetNode(pattern[i])
-                             ?? latestNode.AddNode(pattern[i]);
-            }
+                if ((tempNode = latestNode.GetNode(pattern[i])) != null)
+                {
+                    latestNode = tempNode;
+                }
+                else
+                {
+                    //Если такого имвола ещё нет в потомках, добавляем его
+                    latestNode = latestNode.AddNode(pattern[i]);
+                    var failure = latestNode.Parent.Failure;
+                    var key = latestNode.Key;
+                    while (failure.GetNode(key) == null && failure != _rootNode)
+                    {
+                        failure = failure.Failure;
+                    }
 
+                    failure = failure.GetNode(key);
+                    if (failure == null || failure == latestNode)
+                    {
+                        failure = _rootNode;
+                    }
+
+                    latestNode.Failure = failure;
+                    if (!latestNode.IsFinished)
+                    {
+                        latestNode.IsFinished = failure.IsFinished;
+                    }
+                }
+            }
+            //Заполняем последний узел
             latestNode.IsFinished = true;
-            latestNode.Results.Add(pattern);
+            latestNode.Results = pattern;
+            latestNode.value = value;
         }
 
+        /// <summary>
+        /// Метод удаления слова из дерева
+        /// </summary>
+        /// <param name="pattern">Удаляемое слово</param>
         public void DelPatternToTree(string pattern)
         {
             var latestNode = _rootNode;
-            //tmp = поедпоследний Node
-            var tmpNode = _rootNode;
             var length = pattern.Length;
+            //Ищем нужный узел
             for (var i = 0; i < length; i++)
             {
-                tmpNode = latestNode;
                 latestNode = latestNode.GetNode(pattern[i]);
             }
-            //Если это лист, то только его и удаляем (+ возможно нужна проверка,является ли его родитель листом
-            //и имеет ли он значение, добавлен ли он в словарь)
-            if (latestNode.IsFinished)
-            {
-                tmpNode.IsFinished = true;
-                latestNode = null;
-            }
-            //Results как я понял массив, который говорит, что вот этотузел, хранит вот такие значения
-            else
-            {
-                latestNode.Results.Remove(pattern);
-            }
+            //Обнуляем его значения
+            latestNode.Results = null;
+            latestNode.value = null;
+            latestNode.IsFinished = false;
         }
 
-        private void SetFailures()
+        public void Print()
         {
-            _rootNode.Failure = _rootNode;
             var queue = new Queue<AhoCorasickTreeNode>();
             queue.Enqueue(_rootNode);
 
@@ -158,35 +143,8 @@ namespace MyDictionary
                 {
                     queue.Enqueue(node);
                 }
-
-                if (currentNode == _rootNode)
-                {
-                    continue;
-                }
-
-                var failure = currentNode.Parent.Failure;
-                var key = currentNode.Key;
-                while (failure.GetNode(key) == null && failure != _rootNode)
-                {
-                    failure = failure.Failure;
-                }
-
-                failure = failure.GetNode(key);
-                if (failure == null || failure == currentNode)
-                {
-                    failure = _rootNode;
-                }
-
-                currentNode.Failure = failure;
-                if (!currentNode.IsFinished)
-                {
-                    currentNode.IsFinished = failure.IsFinished;
-                }
-
-                if (currentNode.IsFinished && failure.IsFinished)
-                {
-                    currentNode.Results.AddRange(failure.Results);
-                }
+                if ((currentNode == _rootNode) || (currentNode.Results == null)) continue;
+                Console.WriteLine(currentNode.Results + " - " + currentNode.value);
             }
         }
 
@@ -194,9 +152,12 @@ namespace MyDictionary
         {
             public readonly AhoCorasickTreeNode Parent;
             public AhoCorasickTreeNode Failure;
+            //Является ли конечным
             public bool IsFinished;
-            public List<string> Results;
+            //Что хранит в себе
+            public string Results;
             public readonly char Key;
+            public string value;
 
             private int[] _buckets;
             private int _count;
@@ -214,7 +175,7 @@ namespace MyDictionary
 
                 _buckets = new int[0];
                 _entries = new Entry[0];
-                Results = new List<string>();
+                Results = null;
             }
 
             public AhoCorasickTreeNode[] Nodes

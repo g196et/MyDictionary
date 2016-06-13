@@ -8,66 +8,68 @@ namespace MyDictionary
 {
     class MyDictionary2
     {
-        string[] keys;
-        string[] values;
         AhoCorasickTree aho;
 
-        public MyDictionary2()
-        {
-            keys = new string[1];
-            values = new string[1];
-        }
-
+        /// <summary>
+        /// Бонусная функция - вывода всех элементов
+        /// </summary>
         public void Print()
         {
-            for (int i = 0; i < keys.Length; i++)
-            {
-                Console.WriteLine(keys[i] + " - " + values[i]);
-            }
+            aho.Print();
         }
 
+        /// <summary>
+        /// Поиск элемента по ключу
+        /// </summary>
+        /// <param name="key">Ключдля поиска</param>
+        /// <returns>Возвращается значение по ключу</returns>
         public string Find(string key)
         {
-            if (aho.Contains(key))
-                //Надо научиться возвращать value по key
-                return "true";
+            string temp;
+            if ((temp = aho.Contains(key)) != null)
+            {
+                return temp;
+            }
             else return "false";
         }
 
+        /// <summary>
+        /// Вставка элемента по ключу
+        /// </summary>
+        /// <param name="key">Ключ</param>
+        /// <param name="value">Значение</param>
+        /// <returns>true - если всё успешно, иначе false</returns>
         public bool Insert(string key, string value)
         {
             if (aho == null)
             {
-                string[] tmp = {key};
-                aho = new AhoCorasickTree(tmp);
-                Array.Resize(ref keys, keys.Length + 1);
-                keys[keys.Length - 1] = key;
-                Array.Resize(ref values, values.Length + 1);
-                values[values.Length - 1] = value;
+                string tmp = key;
+                aho = new AhoCorasickTree(tmp, value);
                 return true;
             }
-            if (!aho.Contains(key))
+            if (aho.Contains(key) == null)
             {
-                Array.Resize(ref keys, keys.Length + 1);
-                keys[keys.Length - 1] = key;
-                Array.Resize(ref values, values.Length + 1);
-                values[values.Length - 1] = value;
-                aho.AddPatternToTree(key);
+                aho.AddPatternToTree(key, value);
                 return true;
             }
             else return false;
         }
 
+        /// <summary>
+        /// Удаление по ключу
+        /// </summary>
+        /// <param name="key">Ключ</param>
+        /// <returns>true - если всё спешно, иначе false</returns>
         public bool Remove(string key)
         {
+            string temp;
             if (aho == null)
             {
                 return false;
             }
-            if (aho.Contains(key))
+            if ((temp = aho.Contains(key)) != null)
             {
                 aho.DelPatternToTree(key);
-                //здесь надо удалить значения из keys и values
                 return true;
             }
             return false;

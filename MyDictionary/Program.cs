@@ -35,13 +35,13 @@ namespace MyDictionary
                         string temp = myDictionary.Find(key);
                         Console.WriteLine(temp);
                         break;
-                    //case ("Remove"):
-                    //    Console.Write("Key = ");
-                    //    key = Console.ReadLine();
-                    //    if (myDictionary.Remove(key))
-                    //        Console.WriteLine("Item is remove");
-                    //    else Console.WriteLine("Item not found");
-                    //    break;
+                    case ("r"):
+                        Console.Write("Key = ");
+                        key = Console.ReadLine();
+                        if (myDictionary.Remove(key))
+                            Console.WriteLine("Item is remove");
+                        else Console.WriteLine("Item not found");
+                        break;
                     case ("p"):
                         myDictionary.Print();
                         break;
