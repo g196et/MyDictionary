@@ -1,58 +1,83 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.IO;
-using System.Threading.Tasks;
 
 namespace MyDictionary
 {
-    class Program
+    internal class Program
     {
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
-            string enter, key, value;
-            char[] tchar = new char [10];
-            MyDictionary2 myDictionary = new MyDictionary2();
-            Console.Write("Insert, Find, Remove, Print, File, Exit\n> ");
-            enter = Console.ReadLine();
-            while (enter != "Exit")
-            {     
+            var tchar = new char[10];
+            var myDictionary = new MyDictionary2();
+            Console.Write("Insert — i, Find — f, Remove — r, Print — p , File — file, Exit — e\n> ");
+            var enter = Console.ReadLine();
+            while (enter != "e")
+            {
+                string key;
+                string value;
+                TimeSpan spentTime; // Объявляем переменную типа TimeSpan для хранения затраченного времени
+                DateTime before;
                 switch (enter)
                 {
-                    case ("i"):
+                    case "i":
                         Console.Write("Key = ");
                         key = Console.ReadLine();
                         Console.Write("Value = ");
                         value = Console.ReadLine();
-                        if (!myDictionary.Insert(key, value))
-                            Console.WriteLine("Error");
-                        else Console.WriteLine("Item added");
+                        Console.WriteLine(!myDictionary.Insert(key, value) ? "Error" : "Item added");
                         break;
-                    case ("f"):
+
+                    case "f":
                         Console.Write("Key = ");
                         key = Console.ReadLine();
-                        string temp = myDictionary.Find(key);
-                        Console.WriteLine(temp);
+                        before = DateTime.Now; // Засекаем время до выполнения алгоритма
+                        var temp = myDictionary.Find(key);
+                        // ТУТ ОШИБКА ЧОМУ-ТО НЕ ВОЗВРАЩАЕТ FALSE ЕСЛИ НЕТУ ТАКОВО КЛЮЧА
+                        spentTime = DateTime.Now - before; // Вычисляем время, затраченное на выполнение цикла
+                        Console.WriteLine("{0} (found this shit in {1} ms)", temp, spentTime.TotalMilliseconds);
+                        //чому 0
                         break;
-                    case ("r"):
+
+                    case "r":
                         Console.Write("Key = ");
                         key = Console.ReadLine();
+                        before = DateTime.Now;
                         if (myDictionary.Remove(key))
-                            Console.WriteLine("Item is remove");
+                        {
+                            spentTime = DateTime.Now - before;
+                            Console.WriteLine("Item removed in {0} ms", spentTime.TotalMilliseconds);
+                        }
                         else Console.WriteLine("Item not found");
                         break;
-                    case ("p"):
+
+                    case "p":
                         myDictionary.Print();
                         break;
-                    case ("file"):
-                        using (StreamReader reader = new StreamReader("1.txt"))
+
+                    case "file":
+                        Console.Write("filename = ");
+                        var file = Console.ReadLine();
+                        if (File.Exists(file))
                         {
-                            while ((key = reader.ReadLine()) != null)
-                            {
-                                value = key;
-                                myDictionary.Insert(key, value);
-                            }
+                            if (file != null)
+                                using (var reader = new StreamReader(file))
+                                {
+                                    before = DateTime.Now; // Засекаем время до выполнения алгоритма
+                                    while ((key = reader.ReadLine()) != null)
+                                    {
+                                        var split = key.Split('|');
+                                        key = split[0];
+                                        value = split[1];
+                                        myDictionary.Insert(key, value);
+                                    }
+                                    spentTime = DateTime.Now - before;
+                                    // Вычисляем время, затраченное на выполнение цикла
+                                    Console.WriteLine("added this shit in {0} ms", spentTime.TotalMilliseconds);
+                                }
+                        }
+                        else
+                        {
+                            Console.WriteLine("no such file desu");
                         }
                         break;
                 }

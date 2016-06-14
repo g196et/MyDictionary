@@ -1,21 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace MyDictionary
+﻿namespace MyDictionary
 {
-    class MyDictionary2
+    internal class MyDictionary2
     {
-        AhoCorasickTree aho;
+        private AhoCorasickTree _aho;
 
         /// <summary>
         /// Бонусная функция - вывода всех элементов
         /// </summary>
         public void Print()
         {
-            aho.Print();
+            _aho.Print();
         }
 
         /// <summary>
@@ -26,11 +20,7 @@ namespace MyDictionary
         public string Find(string key)
         {
             string temp;
-            if ((temp = aho.Contains(key)) != null)
-            {
-                return temp;
-            }
-            else return "false";
+            return (temp = _aho.Contains(key)) != null ? temp : "false";
         }
 
         /// <summary>
@@ -41,18 +31,15 @@ namespace MyDictionary
         /// <returns>true - если всё успешно, иначе false</returns>
         public bool Insert(string key, string value)
         {
-            if (aho == null)
+            if (_aho == null)
             {
-                string tmp = key;
-                aho = new AhoCorasickTree(tmp, value);
+                var tmp = key;
+                _aho = new AhoCorasickTree(tmp, value);
                 return true;
             }
-            if (aho.Contains(key) == null)
-            {
-                aho.AddPatternToTree(key, value);
-                return true;
-            }
-            else return false;
+            if (_aho.Contains(key) != null) return false;
+            _aho.AddPatternToTree(key, value);
+            return true;
         }
 
         /// <summary>
@@ -62,17 +49,9 @@ namespace MyDictionary
         /// <returns>true - если всё спешно, иначе false</returns>
         public bool Remove(string key)
         {
-            string temp;
-            if (aho == null)
-            {
-                return false;
-            }
-            if ((temp = aho.Contains(key)) != null)
-            {
-                aho.DelPatternToTree(key);
-                return true;
-            }
-            return false;
+            if (_aho?.Contains(key) == null) return false;
+            _aho.DelPatternToTree(key);
+            return true;
         }
     }
 }

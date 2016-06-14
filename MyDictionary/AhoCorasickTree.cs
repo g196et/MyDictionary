@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MyDictionary
 {
@@ -10,12 +8,14 @@ namespace MyDictionary
     {
         private readonly AhoCorasickTreeNode _rootNode;
 
-        public AhoCorasickTree() { }
+        public AhoCorasickTree()
+        {
+        }
 
         public AhoCorasickTree(string keyword, string value)
         {
             //Обрабатываем ошибки
-            if (keyword == null) throw new ArgumentNullException("keywords");
+            if (keyword == null) throw new ArgumentNullException(nameof(keyword));
             if (keyword.Length == 0) throw new ArgumentException("should contain keywords");
 
             //Устанавливаем корень
@@ -50,15 +50,13 @@ namespace MyDictionary
                         currentNode = currentNode.Failure;
                         return null;
                     }
-                    else
+                    if (i == length - 1)
                     {
-                        if (i == length - 1)
-                        {
-                            return node.Results;
-                        }
-                        currentNode = node;
-                        break;
+                        //return node.Results;
+                        return node.Value;
                     }
+                    currentNode = node;
+                    break;
                 }
             }
 
@@ -73,11 +71,11 @@ namespace MyDictionary
         public void AddPatternToTree(string pattern, string value)
         {
             var latestNode = _rootNode;
-            var tempNode = _rootNode;
             var length = pattern.Length;
             //Проверяем все символы из слова
             for (var i = 0; i < length; i++)
             {
+                AhoCorasickTreeNode tempNode;
                 if ((tempNode = latestNode.GetNode(pattern[i])) != null)
                 {
                     latestNode = tempNode;
@@ -109,7 +107,7 @@ namespace MyDictionary
             //Заполняем последний узел
             latestNode.IsFinished = true;
             latestNode.Results = pattern;
-            latestNode.value = value;
+            latestNode.Value = value;
         }
 
         /// <summary>
@@ -127,7 +125,7 @@ namespace MyDictionary
             }
             //Обнуляем его значения
             latestNode.Results = null;
-            latestNode.value = null;
+            latestNode.Value = null;
             latestNode.IsFinished = false;
         }
 
@@ -144,7 +142,7 @@ namespace MyDictionary
                     queue.Enqueue(node);
                 }
                 if ((currentNode == _rootNode) || (currentNode.Results == null)) continue;
-                Console.WriteLine(currentNode.Results + " - " + currentNode.value);
+                Console.WriteLine(currentNode.Results + " - " + currentNode.Value);
             }
         }
 
@@ -152,12 +150,15 @@ namespace MyDictionary
         {
             public readonly AhoCorasickTreeNode Parent;
             public AhoCorasickTreeNode Failure;
+
             //Является ли конечным
             public bool IsFinished;
+
             //Что хранит в себе
             public string Results;
+
             public readonly char Key;
-            public string value;
+            public string Value;
 
             private int[] _buckets;
             private int _count;
@@ -178,7 +179,7 @@ namespace MyDictionary
                 Results = null;
             }
 
-            public AhoCorasickTreeNode[] Nodes
+            public IEnumerable<AhoCorasickTreeNode> Nodes
             {
                 get { return _entries.Select(x => x.Value).ToArray(); }
             }
@@ -190,7 +191,7 @@ namespace MyDictionary
                 var newSize = _count + 1;
                 Resize(newSize);
 
-                var targetBucket = key % newSize;
+                var targetBucket = key%newSize;
                 _entries[_count].Key = key;
                 _entries[_count].Value = node;
                 _entries[_count].Next = _buckets[targetBucket];
@@ -202,7 +203,7 @@ namespace MyDictionary
 
             public AhoCorasickTreeNode DelNode()
             {
-                var node = this.Parent;
+                var node = Parent;
                 //переделать
                 var newSize = _count - 1;
                 Resize(newSize);
@@ -216,7 +217,7 @@ namespace MyDictionary
             {
                 if (_count == 0) return null;
 
-                var bucketIndex = key % _count;
+                var bucketIndex = key%_count;
                 for (var i = _buckets[bucketIndex]; i >= 0; i = _entries[i].Next)
                 {
                     if (_entries[i].Key == key)
@@ -242,7 +243,7 @@ namespace MyDictionary
                 // rebalancing buckets for existing entries
                 for (var i = 0; i < _entries.Length; i++)
                 {
-                    var bucket = newEntries[i].Key % newSize;
+                    var bucket = newEntries[i].Key%newSize;
                     newEntries[i].Next = newBuckets[bucket];
                     newBuckets[bucket] = i;
                 }
