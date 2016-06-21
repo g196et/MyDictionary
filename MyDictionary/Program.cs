@@ -1,24 +1,24 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 
-namespace MyDictionary
-{
-    internal class Program
-    {
-        private static void Main(string[] args)
-        {
+namespace MyDictionary {
+
+    internal class Program {
+
+        private static void Main (string[] args) {
             var tchar = new char[10];
             var myDictionary = new MyDictionary2();
             Console.Write("Insert — i, Find — f, Remove — r, Print — p , File — file, Exit — e\n> ");
             var enter = Console.ReadLine();
-            while (enter != "e")
-            {
+            while (enter != "e") {
                 string key;
                 string value;
+                long ts;
                 TimeSpan spentTime; // Объявляем переменную типа TimeSpan для хранения затраченного времени
+                Stopwatch stopWatch = new Stopwatch();
                 DateTime before;
-                switch (enter)
-                {
+                switch (enter) {
                     case "i":
                         Console.Write("Key = ");
                         key = Console.ReadLine();
@@ -30,24 +30,25 @@ namespace MyDictionary
                     case "f":
                         Console.Write("Key = ");
                         key = Console.ReadLine();
-                        before = DateTime.Now; // Засекаем время до выполнения алгоритма
-                        var temp = myDictionary.Find(key);
-                        // ТУТ ОШИБКА ЧОМУ-ТО НЕ ВОЗВРАЩАЕТ FALSE ЕСЛИ НЕТУ ТАКОВО КЛЮЧА
-                        spentTime = DateTime.Now - before; // Вычисляем время, затраченное на выполнение цикла
-                        Console.WriteLine("{0} (found this shit in {1} ms)", temp, spentTime.TotalMilliseconds);
-                        //чому 0
+                        try {
+                            stopWatch.Start();
+                            var temp = myDictionary.Find(key);
+                            stopWatch.Stop();
+                            ts = stopWatch.ElapsedTicks;
+
+                            Console.WriteLine("{0} (found this key in {1} ms)", temp, ts);
+                        } catch (Exception) { Console.WriteLine("key not found"); }
                         break;
 
                     case "r":
                         Console.Write("Key = ");
                         key = Console.ReadLine();
-                        before = DateTime.Now;
-                        if (myDictionary.Remove(key))
-                        {
-                            spentTime = DateTime.Now - before;
-                            Console.WriteLine("Item removed in {0} ms", spentTime.TotalMilliseconds);
-                        }
-                        else Console.WriteLine("Item not found");
+                        stopWatch.Start();
+                        if (myDictionary.Remove(key)) {
+                            stopWatch.Stop();
+                            ts = stopWatch.ElapsedTicks;
+                            Console.WriteLine("Item removed in {0} ms", ts);
+                        } else Console.WriteLine("Item not found");
                         break;
 
                     case "p":
@@ -57,14 +58,11 @@ namespace MyDictionary
                     case "file":
                         Console.Write("filename = ");
                         var file = Console.ReadLine();
-                        if (File.Exists(file))
-                        {
+                        if (File.Exists(file)) {
                             if (file != null)
-                                using (var reader = new StreamReader(file))
-                                {
+                                using (var reader = new StreamReader(file)) {
                                     before = DateTime.Now; // Засекаем время до выполнения алгоритма
-                                    while ((key = reader.ReadLine()) != null)
-                                    {
+                                    while ((key = reader.ReadLine()) != null) {
                                         var split = key.Split('|');
                                         key = split[0];
                                         value = split[1];
@@ -72,12 +70,10 @@ namespace MyDictionary
                                     }
                                     spentTime = DateTime.Now - before;
                                     // Вычисляем время, затраченное на выполнение цикла
-                                    Console.WriteLine("added this shit in {0} ms", spentTime.TotalMilliseconds);
+                                    Console.WriteLine("added this key in {0} ms", spentTime.TotalMilliseconds);
                                 }
-                        }
-                        else
-                        {
-                            Console.WriteLine("no such file desu");
+                        } else {
+                            Console.WriteLine("file not found desu");
                         }
                         break;
                 }

@@ -2,18 +2,15 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace MyDictionary
-{
-    public class AhoCorasickTree
-    {
+namespace MyDictionary {
+
+    public class AhoCorasickTree {
         private readonly AhoCorasickTreeNode _rootNode;
 
-        public AhoCorasickTree()
-        {
+        public AhoCorasickTree () {
         }
 
-        public AhoCorasickTree(string keyword, string value)
-        {
+        public AhoCorasickTree (string keyword, string value) {
             //Обрабатываем ошибки
             if (keyword == null) throw new ArgumentNullException(nameof(keyword));
             if (keyword.Length == 0) throw new ArgumentException("should contain keywords");
@@ -29,30 +26,23 @@ namespace MyDictionary
         }
 
         /// <summary>
-        /// Содержание слова в дереве
+        /// Содержание ключа в дереве
         /// </summary>
-        /// <param name="text">Првоеряемое слово</param>
-        /// <returns>Значение для словаря</returns>
-        public string Contains(string text)
-        {
+        /// <param name="text">Првоеряемый ключ</param>
+        /// <returns>Значение в словаре</returns>
+        public string Contains (string text) {
             var currentNode = _rootNode;
-
             var length = text.Length;
-            //Идём по всем символам слова
-            for (var i = 0; i < length; i++)
-            {
-                while (true)
-                {
+            //Идём по всем символам ключа
+            for (var i = 0; i < length; i++) {
+                while (true) {
                     //Проверяем, есть ли следующий символ в потомках узла
                     var node = currentNode.GetNode(text[i]);
-                    if (node == null)
-                    {
+                    if (node == null) {
                         currentNode = currentNode.Failure;
                         return null;
                     }
-                    if (i == length - 1)
-                    {
-                        //return node.Results;
+                    if (i == length - 1) {
                         return node.Value;
                     }
                     currentNode = node;
@@ -64,42 +54,34 @@ namespace MyDictionary
         }
 
         /// <summary>
-        /// Метод добавления слова в дерево
+        /// Метод добавления ключа в дерево
         /// </summary>
-        /// <param name="pattern">Добавляемое слово</param>
+        /// <param name="pattern">Добавляемый ключ</param>
         /// <param name="value">Его значение для словаря</param>
-        public void AddPatternToTree(string pattern, string value)
-        {
+        public void AddPatternToTree (string pattern, string value) {
             var latestNode = _rootNode;
             var length = pattern.Length;
-            //Проверяем все символы из слова
-            for (var i = 0; i < length; i++)
-            {
+            //Проверяем все символы из ключа
+            for (var i = 0; i < length; i++) {
                 AhoCorasickTreeNode tempNode;
-                if ((tempNode = latestNode.GetNode(pattern[i])) != null)
-                {
+                if ((tempNode = latestNode.GetNode(pattern[i])) != null) {
                     latestNode = tempNode;
-                }
-                else
-                {
-                    //Если такого имвола ещё нет в потомках, добавляем его
+                } else {
+                    //Если такого символа ещё нет в потомках, добавляем его
                     latestNode = latestNode.AddNode(pattern[i]);
                     var failure = latestNode.Parent.Failure;
                     var key = latestNode.Key;
-                    while (failure.GetNode(key) == null && failure != _rootNode)
-                    {
+                    while (failure.GetNode(key) == null && failure != _rootNode) {
                         failure = failure.Failure;
                     }
 
                     failure = failure.GetNode(key);
-                    if (failure == null || failure == latestNode)
-                    {
+                    if (failure == null || failure == latestNode) {
                         failure = _rootNode;
                     }
 
                     latestNode.Failure = failure;
-                    if (!latestNode.IsFinished)
-                    {
+                    if (!latestNode.IsFinished) {
                         latestNode.IsFinished = failure.IsFinished;
                     }
                 }
@@ -111,34 +93,29 @@ namespace MyDictionary
         }
 
         /// <summary>
-        /// Метод удаления слова из дерева
+        /// Метод удаления ключа из дерева
         /// </summary>
-        /// <param name="pattern">Удаляемое слово</param>
-        public void DelPatternToTree(string pattern)
-        {
+        /// <param name="pattern">Удаляемый ключ</param>
+        public void DelPatternToTree (string pattern) {
             var latestNode = _rootNode;
             var length = pattern.Length;
-            //Ищем нужный узел
-            for (var i = 0; i < length; i++)
-            {
+            // Ищем нужный узел
+            for (var i = 0; i < length; i++) {
                 latestNode = latestNode.GetNode(pattern[i]);
             }
-            //Обнуляем его значения
+            // Обнуляем его значения
             latestNode.Results = null;
             latestNode.Value = null;
             latestNode.IsFinished = false;
         }
 
-        public void Print()
-        {
+        public void Print () {
             var queue = new Queue<AhoCorasickTreeNode>();
             queue.Enqueue(_rootNode);
 
-            while (queue.Count > 0)
-            {
+            while (queue.Count > 0) {
                 var currentNode = queue.Dequeue();
-                foreach (var node in currentNode.Nodes)
-                {
+                foreach (var node in currentNode.Nodes) {
                     queue.Enqueue(node);
                 }
                 if ((currentNode == _rootNode) || (currentNode.Results == null)) continue;
@@ -146,8 +123,7 @@ namespace MyDictionary
             }
         }
 
-        private class AhoCorasickTreeNode
-        {
+        private class AhoCorasickTreeNode {
             public readonly AhoCorasickTreeNode Parent;
             public AhoCorasickTreeNode Failure;
 
@@ -164,13 +140,11 @@ namespace MyDictionary
             private int _count;
             private Entry[] _entries;
 
-            internal AhoCorasickTreeNode()
-                : this(null, ' ')
-            {
+            internal AhoCorasickTreeNode ()
+                : this(null, ' ') {
             }
 
-            private AhoCorasickTreeNode(AhoCorasickTreeNode parent, char key)
-            {
+            private AhoCorasickTreeNode (AhoCorasickTreeNode parent, char key) {
                 Key = key;
                 Parent = parent;
 
@@ -179,19 +153,17 @@ namespace MyDictionary
                 Results = null;
             }
 
-            public IEnumerable<AhoCorasickTreeNode> Nodes
-            {
+            public IEnumerable<AhoCorasickTreeNode> Nodes {
                 get { return _entries.Select(x => x.Value).ToArray(); }
             }
 
-            public AhoCorasickTreeNode AddNode(char key)
-            {
+            public AhoCorasickTreeNode AddNode (char key) {
                 var node = new AhoCorasickTreeNode(this, key);
 
                 var newSize = _count + 1;
                 Resize(newSize);
 
-                var targetBucket = key%newSize;
+                var targetBucket = key % newSize;
                 _entries[_count].Key = key;
                 _entries[_count].Value = node;
                 _entries[_count].Next = _buckets[targetBucket];
@@ -201,8 +173,7 @@ namespace MyDictionary
                 return node;
             }
 
-            public AhoCorasickTreeNode DelNode()
-            {
+            public AhoCorasickTreeNode DelNode () {
                 var node = Parent;
                 //переделать
                 var newSize = _count - 1;
@@ -213,15 +184,12 @@ namespace MyDictionary
                 return node;
             }
 
-            public AhoCorasickTreeNode GetNode(char key)
-            {
+            public AhoCorasickTreeNode GetNode (char key) {
                 if (_count == 0) return null;
 
-                var bucketIndex = key%_count;
-                for (var i = _buckets[bucketIndex]; i >= 0; i = _entries[i].Next)
-                {
-                    if (_entries[i].Key == key)
-                    {
+                var bucketIndex = key % _count;
+                for (var i = _buckets[bucketIndex]; i >= 0; i = _entries[i].Next) {
+                    if (_entries[i].Key == key) {
                         return _entries[i].Value;
                     }
                 }
@@ -229,11 +197,9 @@ namespace MyDictionary
                 return null;
             }
 
-            private void Resize(int newSize)
-            {
+            private void Resize (int newSize) {
                 var newBuckets = new int[newSize];
-                for (var i = 0; i < newSize; i++)
-                {
+                for (var i = 0; i < newSize; i++) {
                     newBuckets[i] = -1;
                 }
 
@@ -241,9 +207,8 @@ namespace MyDictionary
                 Array.Copy(_entries, 0, newEntries, 0, _entries.Length);
 
                 // rebalancing buckets for existing entries
-                for (var i = 0; i < _entries.Length; i++)
-                {
-                    var bucket = newEntries[i].Key%newSize;
+                for (var i = 0; i < _entries.Length; i++) {
+                    var bucket = newEntries[i].Key % newSize;
                     newEntries[i].Next = newBuckets[bucket];
                     newBuckets[bucket] = i;
                 }
@@ -252,8 +217,7 @@ namespace MyDictionary
                 _entries = newEntries;
             }
 
-            private struct Entry
-            {
+            private struct Entry {
                 public char Key;
                 public int Next;
                 public AhoCorasickTreeNode Value;
