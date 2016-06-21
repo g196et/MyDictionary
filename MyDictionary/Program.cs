@@ -5,6 +5,7 @@ using System.IO;
 namespace MyDictionary {
 
     internal class Program {
+        private static int i;
 
         private static void Main (string[] args) {
             var tchar = new char[10];
@@ -37,12 +38,16 @@ namespace MyDictionary {
                         Console.Write("Key = ");
                         key = Console.ReadLine();
                         try {
-                            stopWatch.Start();
-                            var temp = myDictionary.Find(key);
-                            stopWatch.Stop();
-                            ts = stopWatch.ElapsedTicks;
-                            Console.WriteLine("{0} (found this key in {1} ticks)", temp, ts);
-                        } catch (Exception) { Console.WriteLine("key not found"); }
+                            if (myDictionary.Find(key) == "false")
+                                Console.WriteLine("key not found");
+                            else {
+                                stopWatch.Start();
+                                var temp = myDictionary.Find(key);
+                                stopWatch.Stop();
+                                ts = stopWatch.ElapsedTicks;
+                                Console.WriteLine("{0} (found this key in {1} ticks)", temp, ts);
+                            }
+                        } catch (Exception) { Console.WriteLine("dictionary is empty"); }
                         break;
 
                     case "r":
@@ -57,7 +62,9 @@ namespace MyDictionary {
                         break;
 
                     case "p":
-                        myDictionary.Print();
+                        try {
+                            myDictionary.Print();
+                        } catch (Exception) { Console.WriteLine("dictionary is empty"); }
                         break;
 
                     case "file":
@@ -67,16 +74,18 @@ namespace MyDictionary {
                             if (File.Exists(file)) {
                                 if (file != null)
                                     using (var reader = new StreamReader(file)) {
+                                        i = 0;
                                         stopWatch.Start();
                                         while ((key = reader.ReadLine()) != null) {
                                             var split = key.Split('|');
                                             key = split[0];
                                             value = split[1];
                                             myDictionary.Insert(key, value);
+                                            i++;
                                         }
                                         stopWatch.Stop();
                                         ts = stopWatch.ElapsedMilliseconds;
-                                        Console.WriteLine("loaded and added keys from this file in {0} ms", ts);
+                                        Console.WriteLine("loaded and added {0} keys from this file in {1} ms", i, ts);
                                     }
                             } else {
                                 Console.WriteLine("file not found desu");
