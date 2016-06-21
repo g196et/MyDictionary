@@ -15,16 +15,22 @@ namespace MyDictionary {
                 string key;
                 string value;
                 long ts;
-                TimeSpan spentTime; // Объявляем переменную типа TimeSpan для хранения затраченного времени
                 Stopwatch stopWatch = new Stopwatch();
-                DateTime before;
                 switch (enter) {
                     case "i":
                         Console.Write("Key = ");
                         key = Console.ReadLine();
                         Console.Write("Value = ");
                         value = Console.ReadLine();
-                        Console.WriteLine(!myDictionary.Insert(key, value) ? "Error" : "Item added");
+                        if (!myDictionary.Insert(key, value))
+                            Console.WriteLine("this key exists already");
+                        else {
+                            stopWatch.Start();
+                            myDictionary.Insert(key, value);
+                            stopWatch.Stop();
+                            ts = stopWatch.ElapsedTicks;
+                            Console.WriteLine("successfully added this key in {0} ticks", ts);
+                        }
                         break;
 
                     case "f":
@@ -35,7 +41,6 @@ namespace MyDictionary {
                             var temp = myDictionary.Find(key);
                             stopWatch.Stop();
                             ts = stopWatch.ElapsedTicks;
-
                             Console.WriteLine("{0} (found this key in {1} ticks)", temp, ts);
                         } catch (Exception) { Console.WriteLine("key not found"); }
                         break;
@@ -62,16 +67,16 @@ namespace MyDictionary {
                             if (File.Exists(file)) {
                                 if (file != null)
                                     using (var reader = new StreamReader(file)) {
-                                        before = DateTime.Now; // Засекаем время до выполнения алгоритма
+                                        stopWatch.Start();
                                         while ((key = reader.ReadLine()) != null) {
                                             var split = key.Split('|');
                                             key = split[0];
                                             value = split[1];
                                             myDictionary.Insert(key, value);
                                         }
-                                        spentTime = DateTime.Now - before;
-                                        // Вычисляем время, затраченное на выполнение цикла
-                                        Console.WriteLine("loaded and added keys from this file in {0} ms", spentTime.TotalMilliseconds);
+                                        stopWatch.Stop();
+                                        ts = stopWatch.ElapsedMilliseconds;
+                                        Console.WriteLine("loaded and added keys from this file in {0} ms", ts);
                                     }
                             } else {
                                 Console.WriteLine("file not found desu");
