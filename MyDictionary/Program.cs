@@ -8,7 +8,7 @@ namespace MyDictionary {
 
         private static void Main (string[] args) {
             var tchar = new char[10];
-            var myDictionary = new MyDictionary2();
+            var myDictionary = new MyDictionary();
             Console.Write("Insert — i, Find — f, Remove — r, Print — p , File — file, Exit — e\n> ");
             var enter = Console.ReadLine();
             while (enter != "e") {

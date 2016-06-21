@@ -1,76 +1,51 @@
-﻿using System;
-using System.Linq;
-
-namespace MyDictionary {
+﻿namespace MyDictionary {
 
     internal class MyDictionary {
-
-        //Константы для хэширования
-        private const int Size = 26;
-
-        private const int RandomConst = 1568;
-
-        private readonly string[] _hashList;
-
-        public MyDictionary () {
-            _hashList = new string[50000];
-        }
+        private AhoCorasickTree _aho;
 
         /// <summary>
-        /// Метод хэширования
+        /// Бонусная функция - вывода всех элементов
         /// </summary>
-        /// <param name="key">ключ, который будет хэшироваться</param>
-        /// <returns></returns>
-        private static int GetHash (string key) {
-            return key.Select((t, i) => (int)Math.Pow(Size, key.Length - 1 - i) * t).Sum();
-        }
-
-        /// <summary>
-        /// Метод добавления нового элемента
-        /// </summary>
-        /// <param name="key">ключ</param>
-        /// <param name="value">значение</param>
-        /// <returns>true - если удалось добавить, иначе false</returns>
-        public bool Insert (string key, string value) {
-            var hash = GetHash(key);
-            //Если нашли с таким же хэшем, значит что-то не так
-            if (Find(key))
-                return false;
-            _hashList[hash] = value;
-            return true;
-        }
-
-        /// <summary>
-        /// Метод поиска по ключу
-        /// </summary>
-        /// <param name="key">ключ, по которому производится поиск</param>
-        /// <returns>true - если удалось найди, иначе false</returns>
-        public bool Find (string key) {
-            var hash = GetHash(key);
-            return _hashList[hash] != null;
-        }
-
-        /// <summary>
-        /// Метод удаления по ключу
-        /// </summary>
-        /// <param name="key">ключ, по которому производится удаление</param>
-        /// <returns>true - если удалось удалить, иначе false</returns>
-        public bool Remove (string key) {
-            var hash = GetHash(key);
-            if (Find(key) == false)
-                return false;
-            _hashList[hash] = null;
-            return true;
-        }
-
         public void Print () {
-            var count = 0;
-            foreach (var tmp in _hashList.Where(tmp => tmp != null)) {
-                Console.Write(tmp + " ");
-                count++;
+            _aho.Print();
+        }
+
+        /// <summary>
+        /// Поиск элемента по ключу
+        /// </summary>
+        /// <param name="key">Ключдля поиска</param>
+        /// <returns>Возвращается значение по ключу</returns>
+        public string Find (string key) {
+            string temp;
+            return (temp = _aho.Contains(key)) != null ? temp : "false";
+        }
+
+        /// <summary>
+        /// Вставка элемента по ключу
+        /// </summary>
+        /// <param name="key">Ключ</param>
+        /// <param name="value">Значение</param>
+        /// <returns>true - если всё успешно, иначе false</returns>
+        public bool Insert (string key, string value) {
+            if (_aho == null) {
+                var tmp = key;
+                _aho = new AhoCorasickTree(tmp, value);
+                return true;
             }
-            Console.WriteLine();
-            Console.WriteLine("COUNT = " + count);
+            if (_aho.Contains(key) != null) return false;
+            _aho.AddPatternToTree(key, value);
+            return true;
+        }
+
+        /// <summary>
+        /// Удаление по ключу
+        /// </summary>
+        /// <param name="key">Ключ</param>
+        /// <returns>true - если всё спешно, иначе false</returns>
+        public bool Remove (string key) {
+            if (_aho?.Contains(key) == null) return false;
+            _aho.DelPatternToTree(key);
+            return true;
         }
     }
 }
