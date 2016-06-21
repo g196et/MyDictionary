@@ -36,7 +36,7 @@ namespace MyDictionary {
                             stopWatch.Stop();
                             ts = stopWatch.ElapsedTicks;
 
-                            Console.WriteLine("{0} (found this key in {1} ms)", temp, ts);
+                            Console.WriteLine("{0} (found this key in {1} ticks)", temp, ts);
                         } catch (Exception) { Console.WriteLine("key not found"); }
                         break;
 
@@ -47,7 +47,7 @@ namespace MyDictionary {
                         if (myDictionary.Remove(key)) {
                             stopWatch.Stop();
                             ts = stopWatch.ElapsedTicks;
-                            Console.WriteLine("Item removed in {0} ms", ts);
+                            Console.WriteLine("Item removed in {0} ticks", ts);
                         } else Console.WriteLine("Item not found");
                         break;
 
@@ -58,23 +58,25 @@ namespace MyDictionary {
                     case "file":
                         Console.Write("filename = ");
                         var file = Console.ReadLine();
-                        if (File.Exists(file)) {
-                            if (file != null)
-                                using (var reader = new StreamReader(file)) {
-                                    before = DateTime.Now; // Засекаем время до выполнения алгоритма
-                                    while ((key = reader.ReadLine()) != null) {
-                                        var split = key.Split('|');
-                                        key = split[0];
-                                        value = split[1];
-                                        myDictionary.Insert(key, value);
+                        try {
+                            if (File.Exists(file)) {
+                                if (file != null)
+                                    using (var reader = new StreamReader(file)) {
+                                        before = DateTime.Now; // Засекаем время до выполнения алгоритма
+                                        while ((key = reader.ReadLine()) != null) {
+                                            var split = key.Split('|');
+                                            key = split[0];
+                                            value = split[1];
+                                            myDictionary.Insert(key, value);
+                                        }
+                                        spentTime = DateTime.Now - before;
+                                        // Вычисляем время, затраченное на выполнение цикла
+                                        Console.WriteLine("loaded and added keys from this file in {0} ms", spentTime.TotalMilliseconds);
                                     }
-                                    spentTime = DateTime.Now - before;
-                                    // Вычисляем время, затраченное на выполнение цикла
-                                    Console.WriteLine("added this key in {0} ms", spentTime.TotalMilliseconds);
-                                }
-                        } else {
-                            Console.WriteLine("file not found desu");
-                        }
+                            } else {
+                                Console.WriteLine("file not found desu");
+                            }
+                        } catch (Exception) { Console.WriteLine("error"); }
                         break;
                 }
                 Console.Write("> ");
